@@ -1,6 +1,7 @@
 # Tasks App - Flutter & Firebase
 
-
+* Source Code available in Master Branch.
+  
 ## Overview 📙
 Welcome to the DailyTasks App using Flutter.The main purpose of this project is to demonstarate Flutter developement with Firebase integration to perfrom featuring full CRUD operations to make daily TaskList.
 
