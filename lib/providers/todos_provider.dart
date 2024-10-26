@@ -9,8 +9,6 @@ class TodosProvider extends ChangeNotifier{
    bool isUpdateButtonActivated = false;
    bool isUpdateTextPresent = false;
 
-
-
   void checkTextPresent(String text){
     if(!text.isEmpty){
       isTextPresent = true;
