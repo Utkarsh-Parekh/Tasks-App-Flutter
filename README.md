@@ -1,9 +1,8 @@
 # Tasks App - Flutter & Firebase
 
-* Source Code available in Master Branch.
   
 ## Overview 📙
-Welcome to the DailyTasks App using Flutter.The main purpose of this project is to demonstarate Flutter developement with Firebase integration to perfrom featuring full CRUD operations to make daily TaskList.
+Welcome to the fully functional DailyTasks App using Flutter.The main purpose of this project is to demonstarate Flutter developement with Firebase integration(**Firebase Authentication & Firestore Database**) to perfrom featuring full CRUD operations to make daily TaskList.
 
 ## Dependencies 📦️
 [firebase_core](https://pub.dev/packages/firebase_core) - Firebase Core API, which enables connecting to Firebase apps.
@@ -16,17 +15,32 @@ Welcome to the DailyTasks App using Flutter.The main purpose of this project is 
 
 [random_string](https://pub.dev/packages/random_string) - Provides random genration of numbers,Strings
 
+[firebase_auth](https://pub.dev/packages/firebase_auth) - It enabling user to secure authentication into their new or existing Flutter application.
+
+[delightful_toast](https://pub.dev/packages/delightful_toa) - A delighful and very interactive toast or a snackbar to add more delight to your application.
+
+[go_router](https://pub.dev/packages/go_router) - Router API to provide a convenient, url-based API for navigating between different screens.
+
+[shared_preferences](https://pub.dev/packages/shared_preferences) - Provides persistent storage for simple data.
+
+[Lottie](https://pub.dev/packages/lottie) - It is a Mobile Library that provides Animations.
+
 
 ## Features 🌟
-* Splash Screen
-* Previously Saved TaskList
+* Animated Splash Screen.
+* Secure User Authentication(**Sign In/Sign Up/Password-Recovery/Log-out**).
+* Previously Saved TaskList filtered for Login User.
 * Create, Read, Update, and Delete tasks seamlessly with a clean and intuitive UI.
-* Attractive Snackbar Messages on Creation,Updation & Deleting of tasks
+* Navigation between screens using Go Router.
+* Storing login state (logged in/not) for navigation after launch.
+* Attractive PopUps Messages on Creation,Updation & Deleting of tasks.
+* Animations when there is no Notes/Task available.
 * Custom DialogBox
-* App launch with Icon
+* Launcher Icon 
 
 ## Learnings ✅ 
+* Firebase Authentication
+* Firestore Database
 * CRUD Operations with Firebase Integration
 * Flutter development and UI design 📱
 * State management and user interactions 🔄
-
