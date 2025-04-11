@@ -58,8 +58,7 @@ class _PasswordRecoveryState extends State<PasswordRecovery> {
                     controller: _mailController,
                     onChanged: (value){
                       setState(() {
-                        _mailController.text = value;
-                        isValidEmail = EmailValidator.validate(_mailController.text);
+                        isValidEmail = EmailValidator.validate(value);
                       });
                     },
                     validator: (value) {

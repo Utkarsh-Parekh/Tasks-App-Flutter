@@ -1,6 +1,5 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase/adddialog.dart';
 import 'package:flutter_firebase/services/auth_services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -103,9 +102,9 @@ class _SignInPageState extends State<SignInPage> {
                         controller: emailController,
                         onChanged: (emailValue) {
                           setState(() {
-                            emailController.text = emailValue;
+                            // emailController.text = emailValue;
                             isValidEmail =
-                                EmailValidator.validate(emailController.text);
+                                EmailValidator.validate(emailValue);
                           });
                         },
                         validator: (value) {
@@ -187,28 +186,30 @@ class _SignInPageState extends State<SignInPage> {
                         children: [
                           Expanded(
                             child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xfffc466b),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xfffc466b),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
                                 ),
-                                onPressed: () async {
-                                  if (_key.currentState!.validate()) {
-                                    final SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
-                                    prefs.setString("email", controller.text);
-                                    _authService.signInUserWithEmailAndPassword(
-                                        context,
-                                        emailController.text,
-                                        passwordController.text);
-                                  }
-                                },
-                                child: Text(
-                                  "Sign In",
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 30, color: Colors.white),
-                                )),
+                              ),
+                              onPressed: () async {
+                                if (_key.currentState!.validate()) {
+                                  final SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  // prefs.setString("email", controller.text);
+                                  prefs.setBool("email", true);
+                                  _authService.signInUserWithEmailAndPassword(
+                                      context,
+                                      emailController.text,
+                                      passwordController.text);
+                                }
+                              },
+                              child: Text(
+                                "Sign In",
+                                style: GoogleFonts.poppins(
+                                    fontSize: 30, color: Colors.white),
+                              ),
+                            ),
                           ),
                         ],
                       ),

@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase/providers/todos_provider.dart';
 import 'package:flutter_firebase/services/firestore_services.dart';
+import 'package:flutter_firebase/services/notification_services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart';
@@ -126,8 +127,12 @@ class CustomDialogBox{
 
                // clear the textcontroller
 
-               // controller.clear();
-               // priorityController.clear();
+               NotificationServices().showNotifications( title: 'Task Added',
+               body: 'Your Task has been Successfully Added'
+               );
+
+               controller.clear();
+               priorityController.clear();
 
                UpdateTaskcontroller = controller;
                UpdatepriorityController = priorityController;

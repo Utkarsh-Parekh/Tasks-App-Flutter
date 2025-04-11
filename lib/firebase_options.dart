@@ -50,3 +50,20 @@ class DefaultFirebaseOptions {
   }
 
 
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyDrW82lH1GZJq2sgsPYNtW16mbZUpacL88',
+    appId: '1:531069601456:android:310e2517cfa8c1940ddd75',
+    messagingSenderId: '531069601456',
+    projectId: 'crud-flutter-aff30',
+    storageBucket: 'crud-flutter-aff30.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyAvBFhmCNKmFXFOGNVtAANqL_aHkfkv2ik',
+    appId: '1:531069601456:ios:2f2c09c413c1730c0ddd75',
+    messagingSenderId: '531069601456',
+    projectId: 'crud-flutter-aff30',
+    storageBucket: 'crud-flutter-aff30.appspot.com',
+    iosBundleId: 'com.example.flutterFirebase',
+  );
+}

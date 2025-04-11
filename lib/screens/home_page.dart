@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_firebase/adddialog.dart';
 import 'package:flutter_firebase/providers/todos_provider.dart';
 import 'package:flutter_firebase/services/firestore_services.dart';
+import 'package:flutter_firebase/services/notification_services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
@@ -26,12 +27,19 @@ class _HomePageState extends State<HomePage> {
   TextEditingController controller = TextEditingController();
   TextEditingController priorityController = TextEditingController();
 
+  @override
+  void dispose() {
+    controller.dispose();
+    priorityController.dispose();
+    super.dispose();
+  }
+
   //This is the collection name : "todos"
   final CollectionReference note =
       FirebaseFirestore.instance.collection("todos");
 
   showAlertDialogBox(BuildContext context) {
-   AlertDialog alert =  AlertDialog(
+    AlertDialog alert = AlertDialog(
       backgroundColor: Colors.purple.shade300,
       title: const Text("Confirmation"),
       content: const Text(
@@ -126,7 +134,6 @@ class _HomePageState extends State<HomePage> {
                     'task': controller.text,
                     'priority': priorityController.text,
                   };
-
                   controller.text.isNotEmpty
                       ? await FirestoreServices()
                           .updateTask(id, updateInfo)
@@ -163,6 +170,11 @@ class _HomePageState extends State<HomePage> {
                           },
                         ).show(context);
 
+                  NotificationServices().showNotifications(
+                    title: 'Task Updated',
+                    body: 'Your Task has been successfully updated.',
+                    // imagePath: 'lib/assets/user.jpg',
+                  );
                   // clear the textcontroller
                   controller.clear();
                   priorityController.clear();
@@ -187,71 +199,118 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: Text("Todo List",
-              style: GoogleFonts.poppins(
-                  textStyle: const TextStyle(
-                      fontWeight: FontWeight.w600, color: Colors.white))),
-          backgroundColor: Colors.purple.shade300,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout, color: Colors.white),
-              onPressed: () async {
-                final SharedPreferences prefs =
-                    await SharedPreferences.getInstance();
-                prefs.remove('email');
-                FirebaseAuth.instance.signOut();
-                context.pushNamed("signIn");
-              },
-            )
-          ],
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: Text("Todo List",
+            style: GoogleFonts.poppins(
+                textStyle: const TextStyle(
+                    fontWeight: FontWeight.w600, color: Colors.white))),
+        backgroundColor: Colors.purple.shade300,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: () async {
+              final SharedPreferences prefs =
+                  await SharedPreferences.getInstance();
+              prefs.remove('email');
+              FirebaseAuth.instance.signOut();
+              context.pushNamed("signIn");
+            },
+          )
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.purple,
+        onPressed: () {
+          CustomDialogBox().openAddDialogBox(context);
+        },
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.purple,
-          onPressed: () {
-            CustomDialogBox().openAddDialogBox(context);
-          },
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-        ),
-        body: PopScope(
-          canPop: false,
-          onPopInvoked: ((didpop) async {
-            if (didpop) {
-              return;
-            } else {
-              return showAlertDialogBox(context);
+      ),
+      body: PopScope(
+        canPop: false,
+        onPopInvoked: ((didpop) async {
+          if (didpop) {
+            return;
+          } else {
+            return showAlertDialogBox(context);
+          }
+        }),
+        child: StreamBuilder(
+          stream: note
+              .where("creator",
+                  isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
             }
-          }),
-          child: StreamBuilder(
-            stream: note
-                .where("creator",
-                    isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.data!.size == 0) {
-                return Center(
-                  child: Lottie.asset(
-                    "lib/assets/no_notes.json",
-                  ),
-                );
-              } else {
-                return ListView.builder(
-                  itemCount: snapshot.data?.docs.length,
-                  itemBuilder: (context, index) {
-                    var todos = snapshot.data?.docs[index];
-                    return Dismissible(
-                      key: UniqueKey(),
-                      onDismissed: (Direction) {
-                        if (Direction == DismissDirection.endToStart) {
+            if (snapshot.data!.size == 0) {
+              return Center(
+                child: Lottie.asset(
+                  "lib/assets/nonotes.json",
+                ),
+              );
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data?.docs.length,
+                itemBuilder: (context, index) {
+                  var todos = snapshot.data?.docs[index];
+                  return Dismissible(
+                    key: UniqueKey(),
+                    onDismissed: (Direction) {
+                      if (Direction == DismissDirection.endToStart) {
+                        FirestoreServices().deleteTask(todos['id']);
+                        DelightToastBar(
+                          autoDismiss: true,
+                          snackbarDuration: Durations.extralong3,
+                          position: DelightSnackbarPosition.top,
+                          builder: (context) {
+                            return const ToastCard(
+                              color: Colors.red,
+                              leading: Icon(
+                                Icons.done,
+                                color: Colors.white,
+                              ),
+                              title: Text("Task Deleted Successfully"),
+                            );
+                          },
+                        ).show(context);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          color: Colors.purple.shade100),
+                      child: ListTile(
+                        title: Text(todos!['task'],
+                            style: GoogleFonts.poppins(
+                              textStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500),
+                            )),
+                        subtitle: Text(todos['priority'],
+                            style: GoogleFonts.poppins(
+                              textStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
+                            )),
+                        onTap: () {
+                          // controller.text = todos['task'];
+                          controller.text = snapshot.data?.docs[index]['task'];
+                          priorityController.text = todos['priority'];
+                          openUpdateDialogBox(todos['id']);
+                        },
+                        onLongPress: () {
                           FirestoreServices().deleteTask(todos['id']);
                           DelightToastBar(
                             autoDismiss: true,
@@ -268,62 +327,16 @@ class _HomePageState extends State<HomePage> {
                               );
                             },
                           ).show(context);
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        margin: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: Colors.purple.shade100),
-                        child: ListTile(
-                          title: Text(todos!['task'],
-                              style: GoogleFonts.poppins(
-                                textStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w500),
-                              )),
-                          subtitle: Text(todos['priority'],
-                              style: GoogleFonts.poppins(
-                                textStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                ),
-                              )),
-                          onTap: () {
-                            // controller.text = todos['task'];
-                            controller.text =
-                                snapshot.data?.docs[index]['task'];
-                            priorityController.text = todos['priority'];
-                            openUpdateDialogBox(todos['id']);
-                          },
-                          onLongPress: () {
-                            FirestoreServices().deleteTask(todos['id']);
-                            DelightToastBar(
-                              autoDismiss: true,
-                              snackbarDuration: Durations.extralong3,
-                              position: DelightSnackbarPosition.top,
-                              builder: (context) {
-                                return const ToastCard(
-                                  color: Colors.red,
-                                  leading: Icon(
-                                    Icons.done,
-                                    color: Colors.white,
-                                  ),
-                                  title: Text("Task Deleted Successfully"),
-                                );
-                              },
-                            ).show(context);
-                          },
-                        ),
+                        },
                       ),
-                    );
-                  },
-                );
-              }
-            },
-          ),
-        ));
+                    ),
+                  );
+                },
+              );
+            }
+          },
+        ),
+      ),
+    );
   }
 }

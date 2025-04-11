@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_firebase/services/auth_services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -94,30 +95,18 @@ class _SignInPageState extends State<SignupPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      // Text("Hello Again!",
-                      //     style: Theme.of(context)
-                      //         .textTheme
-                      //         .headlineMedium!
-                      //         .copyWith(color: Colors.black)),
                       const SizedBox(
                         height: 15,
                       ),
                       TextFormField(
-                        // validator: (value) {
-                        //   if (value!.isEmpty) {
-                        //     return "Email Field is Empty";
-                        //     // var snackBar = SnackBar(content: Text("Email Field is Empty"));
-                        //     // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        //   }
-                        // },
                         controller: emailController,
-                        onChanged: (emailValue) {
-                          setState(() {
-                            emailController.text = emailValue;
-                            isValidEmail =
-                                EmailValidator.validate(emailController.text);
-                          });
-                        },
+                            onChanged: (emailValue) {
+                              setState(() {
+                                // emailController.text = emailValue;
+                                isValidEmail =
+                                    EmailValidator.validate(emailValue);
+                              });
+                            },
                         validator: (value) {
                           if (value!.isEmpty) {
                             return "Email Field should not be empty";
@@ -146,8 +135,6 @@ class _SignInPageState extends State<SignupPage> {
                         validator: (value) {
                           if (value!.isEmpty) {
                             return "Password Field should not be Empty";
-                            // var snackBar = SnackBar(content: Text("Password Field is Empty"));
-                            // ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           }
                         },
                         controller: passwordController,
@@ -180,63 +167,34 @@ class _SignInPageState extends State<SignupPage> {
                         children: [
                           Expanded(
                             child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xfffc466b),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xfffc466b),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
                                 ),
-                                onPressed: () async {
-                                  if (_key.currentState!.validate()) {
-                                    await _authService
-                                        .signUpUserWithEmailAndPassword(
-                                            context,
-                                            emailController.text,
-                                            passwordController.text);
-                                  }
-                                },
-                                child: Text(
-                                  "Sign Up",
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 30, color: Colors.white),
-                                )),
+                              ),
+                              onPressed: () async {
+                                if (_key.currentState!.validate()) {
+                                  final SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  // prefs.setString("email", controller.text);
+                                  prefs.setBool("email", true);
+                                  await _authService
+                                      .signUpUserWithEmailAndPassword(
+                                          context,
+                                          emailController.text,
+                                          passwordController.text);
+                                }
+                              },
+                              child: Text(
+                                "Sign Up",
+                                style: GoogleFonts.poppins(
+                                    fontSize: 30, color: Colors.white),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      // InkWell(
-                      //   onTap: () async {
-                      //     if (_key.currentState!.validate()) {
-                      //       await _authService.signUpUserWithEmailAndPassword(
-                      //           context,
-                      //           emailController.text,
-                      //           passwordController.text);
-                      //     }
-                      //   },
-                      //   child: Container(
-                      //     height: 70,
-                      //     width: double.infinity,
-                      //     padding: const EdgeInsets.all(20.0),
-                      //     margin: const EdgeInsets.only(top: 20),
-                      //     decoration: BoxDecoration(
-                      //         gradient: const LinearGradient(
-                      //           colors: [Color(0xfffc466b), Color(0xff3f5efb)],
-                      //           stops: [0.25, 0.75],
-                      //           begin: Alignment.topLeft,
-                      //           end: Alignment.bottomRight,
-                      //         ),
-                      //         borderRadius: BorderRadius.circular(15)),
-                      //     child: Center(
-                      //       child: Text(
-                      //         "SIGN UP",
-                      //         style: Theme.of(context)
-                      //             .textTheme
-                      //             .headlineMedium!
-                      //             .copyWith(color: Colors.white),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-
                       Expanded(
                         child: Align(
                           alignment: Alignment.bottomRight,
@@ -257,18 +215,16 @@ class _SignInPageState extends State<SignupPage> {
                                 onTap: () {
                                   context.go("/signIn");
                                 },
-                                child: Expanded(
-                                  child: Text(
-                                    "Login!",
-                                    softWrap: true,
-                                    style: GoogleFonts.poppins(
-                                      textStyle: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge!
-                                          .copyWith(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w600),
-                                    ),
+                                child: Text(
+                                  "Login!",
+                                  softWrap: true,
+                                  style: GoogleFonts.poppins(
+                                    textStyle: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge!
+                                        .copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w600),
                                   ),
                                 ),
                               ),

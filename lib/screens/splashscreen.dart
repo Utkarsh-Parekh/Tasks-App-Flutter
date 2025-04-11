@@ -20,15 +20,16 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
 
    String? userEmail;
+   bool? isLoggedIn = false;
 
   @override
   void initState(){
     getUserLoggedIn().whenComplete(() async{
-      userEmail == null ?
+      isLoggedIn == null || isLoggedIn == false ?
       Timer(const Duration(seconds: 5),(){
-        context.pushNamed('signIn');
+        context.go('/signIn');
       }) : Timer(const Duration(seconds: 5),(){
-        context.pushNamed('Home');
+        context.go('/');
       });
     },);
     super.initState();
@@ -36,9 +37,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future getUserLoggedIn() async{
     final SharedPreferences preferences = await SharedPreferences.getInstance();
-    var userLoggedIn = preferences.getString("email");
+    // var userLoggedIn = preferences.getString("email");
+    var isUserLogged = preferences.getBool("email");
     setState(() {
-      userEmail = userLoggedIn;
+      isLoggedIn = isUserLogged;
     });
   }
 
@@ -46,16 +48,16 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Center(child: Lottie.asset("lib/assets/animation-logo.json",width: 300,height: 300),),
-            const SizedBox(height: 30,),
-            Text("Daily Task",style: GoogleFonts.poppins(fontSize: 30,color: Colors.purple))
-          ],
-        )
-      ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(child: Lottie.asset("lib/assets/animation-logo.json",width: 300,height: 300),),
+              const SizedBox(height: 30,),
+              Text("Daily Task",style: GoogleFonts.poppins(fontSize: 30,color: Colors.purple))
+            ],
+          )
+        ),
     );
   }
 }
