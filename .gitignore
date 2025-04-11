@@ -1,6 +1,13 @@
 
 lib/utils/firebase_options.dart
 firebase.json
+web
+test
+linux
+macos
+windows
+
+
 # Miscellaneous
 *.class
 *.log
